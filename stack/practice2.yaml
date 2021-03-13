@@ -42,6 +42,12 @@ Resources:
           ToPort: '3306'
           SourceSecurityGroupName: !Ref EC2EventsSecurityGroup # Only allow access to instances of this group
 
+  # S3 bucket
+  p2S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+
   # Roles
   p2EC2Role:
     Type: AWS::IAM::Role
@@ -56,8 +62,18 @@ Resources:
             Action:
               - 'sts:AssumeRole'
       Description: "Role with permissions to S3 full access and RDS full data access "
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      Policies:
+        - PolicyName: AmazonP2S3BucketFullAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource:
+                  !Join
+                  - ''
+                  - - !GetAtt p2S3Bucket.Arn
+                    - '/*'
       RoleName: p2-ec2-role
 
   # Instance profile
@@ -92,7 +108,6 @@ Resources:
   p2EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: "p2-keys"
       ImageId: !Ref AMIId
       InstanceType: "t2.micro"
       SecurityGroupIds:
