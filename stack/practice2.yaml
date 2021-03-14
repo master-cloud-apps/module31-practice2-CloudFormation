@@ -111,7 +111,6 @@ Resources:
   p2EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: p2-keys
       ImageId: !Ref AMIId
       InstanceType: "t2.micro"
       SecurityGroupIds:
@@ -130,7 +129,6 @@ Resources:
             wget ${JarUrl}
             java -jar app.jar
           - {
-              RdsEndpoint: !GetAtt p2RDSInstance.Endpoint.Address,
               RdsPass: !Ref DBPassword,
               BucketName: !Ref BucketName,
               JarUrl: !Ref DownloadAppUrl
