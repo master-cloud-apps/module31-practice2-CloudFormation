@@ -86,6 +86,7 @@ Resources:
   # RDS Instance
   p2RDSInstance:
     Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
     Properties:
       DBInstanceClass: db.t2.micro
       AllocatedStorage: 10
