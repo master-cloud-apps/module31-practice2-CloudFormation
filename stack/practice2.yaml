@@ -17,7 +17,7 @@ Parameters:
   DownloadAppUrl:
     Description: "Url from the app will be downloaded"
     Type: String
-    Default: https://s3.amazonaws.com/practica-2.cloud.michel/app.jar
+    Default: https://github.com/master-cloud-apps/module31-practice2-CloudFormation/releases/download/v1.0/app.jar
 
 Resources:
   # Security groups
@@ -74,6 +74,8 @@ Resources:
                   - ''
                   - - !GetAtt p2S3Bucket.Arn
                     - '/*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
       RoleName: p2-ec2-role
 
   # Instance profile
@@ -92,7 +94,7 @@ Resources:
       AllocatedStorage: 10
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: false
-      DBInstanceIdentifier: p2-rds-mysql-instance
+      DBInstanceIdentifier: p2rdsinstance
       DBName: p2Database
       Engine: mysql
       EngineVersion: 8.0
@@ -109,6 +111,7 @@ Resources:
   p2EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
+      KeyName: p2-keys
       ImageId: !Ref AMIId
       InstanceType: "t2.micro"
       SecurityGroupIds:
@@ -120,10 +123,8 @@ Resources:
             #!/bin/bash -ex
             apt update && apt install -y openjdk-11-jre-headless
             export spring_profiles_active=production
-            export RDS_ENDPOINT=${RdsEndpoint}
-            export RDS_DATABASE=p2Database
-            export RDS_USER=p2DbUsername
-            export RDS_PASS=${RdsPass}
+            export cloud_aws_rds_dbInstanceIdentifier=p2rdsinstance
+            export cloud_aws_rds_p2rdsinstance_password=${RdsPass}
             export BUCKET_NAME=${BucketName}
             export REGION=eu-west-1
             wget ${JarUrl}
